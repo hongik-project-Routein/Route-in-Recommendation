@@ -1,8 +1,8 @@
 from sklearn.feature_extraction.text import TfidfTransformer
 import urllib.request
 
-df1 = pd.read_csv('/home/smin/smin-test/route-in/csv/review_data.csv')
-df2 = pd.read_csv('/home/smin/smin-test/route-in/csv/review_data2.csv')
+df1 = pd.read_csv('/data/naver_dining_review.csv')
+df2 = pd.read_csv('/data/ds01.csv')
 
 def text_cleansing(text): 
     re_text = re.compile('[^ ㄱ-ㅣ가-힣]+')
