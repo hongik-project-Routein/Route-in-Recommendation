@@ -32,7 +32,19 @@ shop_df.drop("origin_reivew", axis=1, inplace=True)
 shop_df['sentiment_score'] = shop_df['ratings'].apply(lambda x: 0 if x <= 3 else 1) # 리뷰점수 3 이하는 부정(0)으로, 4이상은 긍정(1)
 shop_df = shop_df[['clean_review', 'sentiment_score']]
 
-# 데이터셋 합치기
-pdList = [df1, df2, shop_df]
-all_df = pd.concat(pdList).reset_index(drop=True)
+urllib.request.urlretrieve("https://raw.githubusercontent.com/e9t/nsmc/master/ratings_train.txt", filename="/home/smin/smin-test/route-in/csv/ratings_train.txt")
+urllib.request.urlretrieve("https://raw.githubusercontent.com/e9t/nsmc/master/ratings_test.txt", filename="/home/smin/smin-test/route-in/csv/ratings_test.txt")
+movie_df1 = pd.read_table('/home/smin/smin-test/route-in/csv/ratings_train.txt')
+movie_df2 = pd.read_table('/home/smin/smin-test/route-in/csv/ratings_test.txt')
 
+#쓸모없는 행 삭제
+movie_df1 = movie_df1.drop(['id'], axis=1)
+movie_df2 = movie_df2.drop(['id'], axis=1)
+movie_df1.rename(columns = {"document": "clean_review", "label" : "sentiment_score"}, inplace = True)
+movie_df2.rename(columns = {"document": "clean_review", "label" : "sentiment_score"}, inplace = True)
+
+
+# 데이터셋 합치기
+pdList = [df1, df2, shop_df, movie_df1, movie_df2]
+all_df = pd.concat(pdList).reset_index(drop=True)
+## 총 414587개
