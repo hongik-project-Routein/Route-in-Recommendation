@@ -1,5 +1,13 @@
+from keras import models
+from tensorflow.keras.layers import Embedding, Dense, LSTM, GRU, Dropout
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import load_model
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.preprocessing.text import Tokenizer
 from sklearn.feature_extraction.text import TfidfTransformer
+
 import urllib.request
+import pickle
 
 df1 = pd.read_csv('/data/naver_dining_review.csv')
 df2 = pd.read_csv('/data/ds01.csv')
@@ -48,3 +56,44 @@ movie_df2.rename(columns = {"document": "clean_review", "label" : "sentiment_sco
 pdList = [df1, df2, shop_df, movie_df1, movie_df2]
 all_df = pd.concat(pdList).reset_index(drop=True)
 ## 총 414587개
+
+
+# 학습용, 테스트용 데이터셋 분리
+train, test = train_test_split(all_df, test_size=0.2, random_state=210617)
+
+# 학습용 데이터셋 라벨 분포 확인
+train['sentiment_score'].value_counts().plot(kind = 'bar')
+print(train.groupby('sentiment_score').size().reset_index(name = 'count'))
+
+stopwords = ['도', '는', '다', '의', '가', '이', '은', '한', '에', '하', '고', '을', '를', '인', '듯', '과', '와', '네', '들', '듯', '지', '임', '게']
+
+mecab = Mecab()
+train_list = [] 
+test_list = []
+
+for sentence in train['clean_review']:
+    temp_X = mecab.morphs(sentence, stem = True) 
+    temp_X = [word for word in temp_X if not word in stopwords] # 불용어 제거
+    train_list.append(temp_X)
+for sentence in test['clean_review']:
+    temp_X = mecab.morphs(sentence, stem = True) # 토큰화
+    temp_X = [word for word in temp_X if not word in stopwords] # 불용어 제거
+    test_list.append(temp_X)
+
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(train_list)
+tokenizer.fit_on_texts(test_list)
+
+# 생성한 단어사전 저장
+with open("all_reviews.pickle","wb") as fw:
+    pickle.dump(tokenizer, fw)
+
+
+# 단어로 쪼개진 문장 숫자로
+t_train1 = tokenizer.texts_to_sequences(train_list)
+t_test1 = tokenizer.texts_to_sequences(test_list)
+
+# 정답으로 사용할 감정점수 분류
+s_train = train['sentiment_score']
+s_test = test['sentiment_score']
+
