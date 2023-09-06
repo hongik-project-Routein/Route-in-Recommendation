@@ -36,11 +36,17 @@ def get_place(sim_users, target_user):
         location="asia-northeast3",
         job_id_prefix="bq_job_get_place_",
     )
+    
+    # # 결과값 데이터프레임으로
+    # query_df = query_job.to_dataframe()
+    # print(query_df)
 
-    # 결과값 데이터프레임으로 출력
-    query_df = query_job.to_dataframe()
-    print(query_df)
+    sim_place_list = []
+    query_result = query_job.result()
+    for r in query_result:
+        sim_place_list.append([r['userId'], r['mapId']])
 
+    print(sim_place_list)
     return "Complete def get_place"
 
 
