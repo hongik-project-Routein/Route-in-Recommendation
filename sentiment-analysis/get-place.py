@@ -1,12 +1,13 @@
 # 사용자A가 추천 탭 클릭했을 때 유사 사용자가 긍정(1)으로 표기했지만 A는 가보지 않은 장소(핀)찾기
 # output(list): [‘userId’, ‘mapId’]
-
+import pandas as pd
 from google.cloud import bigquery
 client = bigquery.Client()
 
-table_id = "projectid.route_in.sentimental-analysis"
+table_id = "carbon-inkwell-290604.route_in.sentimental-analysis"
 
 def get_place(sim_users, target_user):
+
     # 유사한 유저 1명인 경우 
     if len(sim_users) == 1:
         for i in sim_users:
@@ -16,31 +17,30 @@ def get_place(sim_users, target_user):
     else :
         sim_users_where_temp2 = ""
         for i in sim_users:
-            sim_users_where_temp1 = i + ","
+            sim_users_where_temp1 = "\'{}\'".format(i) + ","
             sim_users_where_temp2 = sim_users_where_temp2 + sim_users_where_temp1 
         sim_users_where = "(" + sim_users_where_temp2 + ")"
         sim_users_where = sim_users_where.replace(",)", ")")
-        print(sim_users_where)
+        # print(sim_users_where)
 
-    # Make an API request.
-    query_job = client.query(
-
-        """
+    query_str = """
         SELECT userId, mapId FROM `{}` 
         WHERE 
-            userId IN ({})
-            AND userId != {}
+            userId IN {}
+            AND userId != '{}'
             AND score = '1'
-        """.format(table_id, sim_users_where, target_user),
+    """.format(table_id, sim_users_where, target_user)
 
+    query_job = client.query(
+        query_str,
         location="asia-northeast3",
-        job_config=bigquery.QueryJobConfig(
-            labels={"example-label": "example-value"},
-            maximum_bytes_billed=1000000
-        ),
-        job_id_prefix="get_place_",
-    ) 
-    print(query_job)
+        job_id_prefix="bq_job_get_place_",
+    )
+
+    # 결과값 데이터프레임으로 출력
+    query_df = query_job.to_dataframe()
+    print(query_df)
+
     return "Complete def get_place"
 
 
