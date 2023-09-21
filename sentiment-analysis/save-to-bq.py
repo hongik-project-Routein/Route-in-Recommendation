@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 client = bigquery.Client()
 
-table_id = "carbon-inkwell-290604.route_in.sentimental-analysis"
+table_id = "carbon-inkwell-290604.route_in.sentimental_score"
 
 def save_sa(row_list):
     for row in row_list:
@@ -14,7 +14,7 @@ def save_sa(row_list):
         ]
 
         errors = client.insert_rows_json(
-            table_id, rows_to_insert, row_ids=[None] * len(rows_to_insert)
+            table_id, rows_to_insert
         )  # Make an API request.
         if errors == []:
             print("New rows have been added.")
@@ -22,9 +22,3 @@ def save_sa(row_list):
             print("Encountered errors while inserting rows: {}".format(errors))
 
     return "Complete def save_sa"
-
-## Test
-test_list = [
-    ['user3', '10361948', '0'], ['user1', '10361948', '1'], ['user5', '10361948', '1'], ['user7', '10361948', '0'], ['user2', '10361948', '1']
-    ]
-save_sa(test_list)
