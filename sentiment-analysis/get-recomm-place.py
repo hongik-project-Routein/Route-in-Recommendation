@@ -1,10 +1,12 @@
 # 사용자A가 추천 탭 클릭했을 때 유사 사용자가 긍정(1)으로 표기했지만 A는 가보지 않은 장소(핀)찾기
 # output(list): [‘userId’, ‘mapId’]
+
+
 import pandas as pd
 from google.cloud import bigquery
 client = bigquery.Client()
 
-table_id = "carbon-inkwell-290604.route_in.sentimental-analysis"
+table_id = "carbon-inkwell-290604.route_in.sentimental_score"
 
 def get_place(sim_users, target_user):
 
@@ -49,7 +51,7 @@ def get_place(sim_users, target_user):
     print(sim_place_list)
     return "Complete def get_place"
 
-
+## test
 ex_sim_users = ['user2', 'user5']
 ex_target_user = 'user1'
 get_place(ex_sim_users, ex_target_user)
