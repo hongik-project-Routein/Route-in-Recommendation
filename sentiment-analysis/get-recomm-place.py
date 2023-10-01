@@ -30,7 +30,7 @@ def get_place(sim_users, target_user):
         WHERE 
             userId IN {}
             AND userId != '{}'
-            AND score = '1'
+            AND score >= '0.5'
     """.format(table_id, sim_users_where, target_user)
 
     query_job = client.query(
